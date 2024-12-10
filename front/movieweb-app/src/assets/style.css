@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lexend', cursive;
+    position: relative;
+    min-height: 100vh;
+    margin: 0;
+    padding-bottom: 3em;
+    background-color: #f4f4f4;;
+}
+
+main { 
+    width: 90vw;
+    max-width: 1200px;
+    align-items: center;
+    margin: 0 auto; 
+    padding: 0 20px;
+}
+
+:root {
+    --el-color-primary: #4b0082; 
+    --el-color-primary-light-3: #6a2a8c; 
+    --el-color-primary-dark-2: #3d0066; 
+    --el-color-success: #67C23A; 
+    --el-color-warning: #E6A23C; 
+    --el-color-error: #F56C6C; 
+    --el-color-info: #909399;
+}
+
+.el-button {
+    background-color: #4b0082; 
+    border-color: #3d0066; 
+    color: white;
+    font-family: "Quicksand", sans-serif;
+}
+
+.el-button:hover {
+    background-color: #3d0066;
+    border-color: #3d0066;
+}
+
+.el-button:focus {
+    box-shadow: 0 0 0 0.2rem #6a2a8c;
+}
+
+.close:hover {
+    color: #6a2a8c;
+}
