@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,6 +40,14 @@ public class Movie
   @DecimalMin(value = "0")
   @DecimalMax(value = "10")
   private double rating;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+          name = "movie_genre_map",
+          joinColumns = @JoinColumn(name = "movie_id"),
+          inverseJoinColumns = @JoinColumn(name = "genre_id")
+  )
+  private Set<MovieGenre> genres = new HashSet<>();
 
   @Column(name = "img", nullable = false)
   private String img;

@@ -1,6 +1,6 @@
 <template>
   <div class="movie-list">
-    <MovieFilter @updateFilters="updateFilters" />
+    <MovieFilter @updateFilters="updateFilters" :genres="genres"/>
 
     <div v-if="loading">Loading...</div> 
     <div v-else-if="error">{{ error }}</div>
@@ -31,6 +31,7 @@ import axios from 'axios';
 import MovieFilter from '@/components/MovieFilter.vue';
 import Movie from '@/components/Movie.vue';
 import Pagination from '@/components/Pagination.vue';
+import { ElNotification } from 'element-plus';
 
 const movies = ref([]);
 const loading = ref(true);
@@ -39,9 +40,15 @@ const currentPage = ref(1);
 const itemsPerPage = ref(5);
 const totalPages = ref(0);
 const totalElements = ref(0);
+const genres = ref([]);
 
 const filters = ref({
   title: '',
+  minYear: null,
+  maxYear: null,
+  sortByRating: null,
+  sortByYear: null,
+  genres: [],
 });
 
 const buildSearchQuery = () => {
@@ -49,6 +56,17 @@ const buildSearchQuery = () => {
   if (filters.value.title) {
     queries.push(`title:*${filters.value.title}*`);
   }
+  if (filters.value.minYear !== null) {
+    queries.push(`year>${filters.value.minYear}`);
+  }
+  if (filters.value.maxYear !== null) {
+    queries.push(`year<${filters.value.maxYear}`);
+  }
+  if (filters.value.genres.length > 0) {
+    const genreQueries = filters.value.genres.map(genre => `genres;${genre}`);
+    queries.push(`(${genreQueries.join(',')})`);
+  }
+
   return queries.join(',');
 };
 
@@ -57,10 +75,17 @@ const fetchData = async (page) => {
     loading.value = true;
     const searchQuery = buildSearchQuery();
 
+    const sortOrder = filters.value.sortByRating === 'ratingAsc' ? 'rating,asc' :
+      filters.value.sortByRating === 'ratingDesc' ? 'rating,desc' :
+        filters.value.sortByYear === 'yearAsc' ? 'year,asc' :
+          filters.value.sortByYear === 'yearDesc' ? 'year,desc' :
+            'id,asc';
+
     const response = await axios.get('/api/movies', {
       params: {
         page: page - 1,
         size: itemsPerPage.value,
+        sort: sortOrder,
         search: searchQuery,
       },
     });
@@ -76,6 +101,22 @@ const fetchData = async (page) => {
   }
 };
 
+
+const fetchGenres = async () => {
+  try {
+    const response = await axios.get('/api/movie-genres', {
+      params: { size: 9999 },
+    });
+    genres.value = response.data.content || [];
+  } catch (error) {
+    ElNotification.error({
+      title: 'Error',
+      message: 'There was an error loading the movie genres.',
+    });
+    genres.value = [];
+  }
+};
+
 const updateFilters = (newFilters) => {
   filters.value = newFilters;
   currentPage.value = 1;
@@ -88,30 +129,33 @@ const goToPage = (page) => {
   fetchData(currentPage.value);
 };
 
-onMounted(() => fetchData(currentPage.value));
+onMounted(() => {
+  fetchGenres();
+  fetchData(currentPage.value)
+  });
 </script>
 
 <style scoped>
 .movie-grid {
   display: flex;
-  justify-content: space-between; /* Odstępy między elementami */
-  flex-wrap: nowrap; /* Jedna linia */
-  padding: 0; /* Bez marginesów wokół siatki */
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  padding: 0; 
 }
 
 .movie-item {
-  flex: 1 1 auto; /* Automatyczne skalowanie w jednej linii */
-  max-width: calc(100% / 5); /* 6 elementów na jedną linię */
-  margin: 0 5px; /* Marginesy między elementami */
+  flex: 1 1 auto; 
+  max-width: calc(100% / 5);
+  margin: 0 5px;
   box-sizing: border-box;
 }
 
 .movie-item:first-child {
-  margin-left: 10px; /* Brak marginesu z lewej strony */
+  margin-left: 10px;
 }
 
 .movie-item:last-child {
-  margin-right: 0; /* Brak marginesu z prawej strony */
+  margin-right: 0;
 }
 
 

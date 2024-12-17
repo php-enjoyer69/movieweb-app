@@ -1,14 +1,15 @@
 package movieweb.movieweb.specifications;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import movieweb.movieweb.entities.Movie;
+import movieweb.movieweb.entities.MovieGenre;
 import org.springframework.data.jpa.domain.Specification;
 import movieweb.movieweb.criteria.SearchCriteria;
+
+import java.util.Collection;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,6 +29,15 @@ public class MovieSpecification implements Specification<Movie>
       case STARTS_WITH  -> builder.like(root.get(criteria.getKey()), criteria.getValue() + "%");
       case ENDS_WITH    -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue());
       case CONTAINS     -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue() + "%");
+      case IN_SET       -> {
+        Collection<?> genreValues = List.of((String) criteria.getValue());
+
+        Join<Movie, MovieGenre> join = root.join("genres");
+
+        Predicate genrePredicate = join.get("name").in(genreValues);
+
+        yield genrePredicate;
+      }
     };
   }
 }

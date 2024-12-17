@@ -19,14 +19,15 @@ h1 {
 
 h3 {
   color: #575757;
+  margin-bottom: 45px;
 }
 
 .movie-view-page {
   padding: 20px;
-  margin: 0 auto; /* Wyśrodkowanie strony */
-  max-width: 1250px; /* Ograniczenie szerokości widoku */
+  margin: 0 auto;
+  max-width: 1250px;
   background-color: #fff;
-  border-radius: 8px; /* Zaokrąglone rogi */
+  border-radius: 8px; 
 }
 
 </style>

@@ -1,6 +1,9 @@
 package movieweb.movieweb.services;
 
 import com.google.common.base.Joiner;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import movieweb.movieweb.dtos.movies.MovieDto;
 import movieweb.movieweb.dtos.movies.NewMovieDto;
@@ -17,6 +20,7 @@ import movieweb.movieweb.exceptions.AppException;
 import movieweb.movieweb.mappers.MovieMapper;
 import movieweb.movieweb.repositories.MovieRepository;
 import movieweb.movieweb.specifications.MovieSpecificationsBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -28,6 +32,8 @@ public class MovieService
 {
   private final MovieRepository movieRepository;
   private final MovieMapper movieMapper;
+  @PersistenceContext
+  EntityManager entityManager;
 
   public MovieDto findById(Long id)
   {
@@ -107,17 +113,23 @@ public class MovieService
     return movieMapper.toMovieDto(updatedMovie);
   }
 
+  @Transactional
   public Movie delete(Long id)
   {
     Movie movie = movieRepository.findById(id)
-        .orElseThrow(() -> new AppException("Unknown movie", HttpStatus.NOT_FOUND));
+            .orElseThrow(() -> new AppException("Unknown movie", HttpStatus.NOT_FOUND));
+
+    String deleteJoinTableQuery = "DELETE FROM movie_genre_map WHERE movie_id = ?";
+    Query query = entityManager.createNativeQuery(deleteJoinTableQuery);
+    query.setParameter(1, id);
+    query.executeUpdate();
 
     try {
       movieRepository.delete(movie);
     }
     catch (DataIntegrityViolationException ex)
     {
-      throw new AppException("Cannot delete the movie, this movie is ordered", HttpStatus.BAD_REQUEST);
+      throw new AppException("Cannot delete the movie", HttpStatus.BAD_REQUEST);
     }
 
     return movie;

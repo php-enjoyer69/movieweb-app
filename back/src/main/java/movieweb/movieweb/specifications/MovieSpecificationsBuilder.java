@@ -46,10 +46,11 @@ public class MovieSpecificationsBuilder
     for (int i = 1; i < params.size(); i++)
     {
       result = params.get(i).isOrPredicate()
-        ? Specification.where(result).or(new MovieSpecification(params.get(i)))
-        : Specification.where(result).and(new MovieSpecification(params.get(i)));
+              ? Specification.where(result).or(new MovieSpecification(params.get(i)))
+              : Specification.where(result).and(new MovieSpecification(params.get(i)));
     }
 
     return result;
   }
+
 }

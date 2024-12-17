@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import movieweb.movieweb.entities.MovieGenre;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +18,7 @@ import java.math.BigDecimal;
 public class NewMovieDto
 {
   @NotEmpty(message = "Title is required")
-  @Size(min = 2, max = 50, message = "Title must be between 2 and 50 characters")
+  @Size(min = 2, max = 50, message = "The title must be between 2 and 50 characters")
   private String title;
 
   @NotEmpty(message = "Description is required")
@@ -31,6 +33,9 @@ public class NewMovieDto
   @DecimalMin(value = "0.0", inclusive = true, message = "Rating must be a non-negative number")
   @DecimalMax(value = "10.0", inclusive = true, message = "Rating must be at most 10.0")
   private Double rating; // Nullable field
+
+  @NotNull(message = "At least one genre is required")
+  private Set<MovieGenre> genres;
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private String img;
