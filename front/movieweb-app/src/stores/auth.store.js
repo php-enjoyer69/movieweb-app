@@ -34,13 +34,12 @@ export const useAuthStore = defineStore({
             localStorage.removeItem('user');
 
         },
-        async register(email, password, name, surname, passwordConfirmation) {
+        async register(email, password, name, passwordConfirmation) {
             try {
                 await axios.post('http://localhost:8000/register', {
                     email,
                     password,
                     name,
-                    surname,
                     passwordConfirmation
                 });
             } catch (err) {

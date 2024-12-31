@@ -24,10 +24,6 @@ public class User
     @Size(min = 2, max = 50)
     private String name;
 
-    @Column(name = "surname", nullable = false)
-    @Size(min = 2, max = 50)
-    private String surname;
-
     @Column(name = "email", nullable = false, unique = true)
     @Size(min = 2, max = 50)
     @Email

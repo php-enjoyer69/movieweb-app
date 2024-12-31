@@ -6,9 +6,9 @@
                 class="register-form-item">
                 <el-input v-model="form.email" class="register-input" placeholder="Your email" />
             </el-form-item>
-            <el-form-item label="Name" prop="username" :error="error?.username" :show-message="error?.username ? true : false"
+            <el-form-item label="Username" prop="name" :error="error?.name" :show-message="error?.name ? true : false"
                 class="register-form-item">
-                <el-input v-model="form.username" class="register-input" placeholder="Your username" />
+                <el-input v-model="form.name" class="register-input" placeholder="Your username" />
             </el-form-item>
             <el-form-item label="Password" prop="password" :error="error?.password"
                 :show-message="error?.password ? true : false" class="register-form-item">
@@ -17,7 +17,7 @@
             </el-form-item>
             <el-form-item label="Confirm password" prop="passwordConfirmation" :error="error?.passwordConfirmation"
                 :show-message="error?.passwordConfirmation ? true : false" class="register-form-item">
-                <el-input v-model="form.passwordConfirmation" class="register-input" type="password"
+                <el-input v-model="form.passwordConfirmation" class="password-input" type="password"
                     placeholder="Confirm password" show-password />
             </el-form-item>
             <el-form-item>
@@ -25,12 +25,12 @@
             </el-form-item>
             <el-form-item>
                 <router-link to="/" class="register-button">
-                    <el-button type="info" class="cancel-button">Cancel</el-button>
+                    <el-button type="info" class="register-button">Cancel</el-button>
                 </router-link>
             </el-form-item>
         </el-form>
 
-        <div v-if="loading" class="loading-indicator">Ładowanie...</div>
+        <div v-if="loading" class="loading-indicator">Loading...</div>
     </div>
 </template>
 
@@ -45,7 +45,7 @@ const authStore = useAuthStore();
 const form = ref({
     email: '',
     password: '',
-    username: '',
+    name: '',
     passwordConfirmation: ''
 });
 const loading = ref(false);
@@ -53,7 +53,7 @@ const error = ref(null);
 const userdata = ref(null);
 const success = () => {
   ElMessage({
-    message: 'Registered successfully',
+    message: 'Registered successfully. You can log in now to your account.',
     type: 'success',
   })
 }
@@ -63,13 +63,14 @@ const handleRegister = async () => {
     error.value = null;
 
     try {
-        await authStore.register(form.value.email, form.value.password, form.value.username, form.value.passwordConfirmation);
+        await authStore.register(form.value.email, form.value.password, form.value.name, form.value.passwordConfirmation);
         userdata.value = authStore.user;
         success();
         form.value.email = "";
         form.value.password = "";
-        form.value.username = '';
+        form.value.name = '';
         form.value.passwordConfirmation = '';
+        router.push('/');
     } catch (err) {
         error.value = err.response.data.errors;
     } finally {
@@ -81,7 +82,7 @@ const handleRegister = async () => {
 <style scoped>
 .register-container {
     max-width: 400px;
-    margin: 50px auto;
+    margin: 50px auto 6rem;
     padding: 20px;
     border: 1px solid #dcdfe6;
     border-radius: 8px;
@@ -96,6 +97,11 @@ const handleRegister = async () => {
 
 .register-input {
     width: 100%;
+}
+
+.password-input {
+    width: 100%;
+    margin-bottom: 35px;
 }
 
 .register-button {
@@ -117,20 +123,6 @@ const handleRegister = async () => {
     margin-top: 15px;
     list-style-type: none;
     padding: 0;
-}
-
-.cancel-button {
-    width: 100%;
-    color: #4caf50;
-    border: 1px solid #4caf50;
-    background-color: transparent;
-    font-weight: 600;
-}
-
-.cancel-button:hover {
-    background-color: #e8f5e9;
-    color: #4caf50;
-    border-color: #4caf50;
 }
 
 .loading-indicator {

@@ -1,13 +1,13 @@
 <template>
     <div class="login-container">
-        <h2 class="login-title">Log in</h2>
+        <h2 class="login-title">Log in to MovieWeb</h2>
         <el-form @submit.native.prevent="handleLogin" :model="form" ref="loginForm" label-position="top">
             <el-form-item label="Email" prop="email" :error="error?.email" :show-message="error?.email ? true : false">
                 <el-input v-model="form.email" class="login-input" placeholder="Email" />
             </el-form-item>
             <el-form-item label="Password" prop="password" :error="error?.password"
                 :show-message="error?.password ? true : false">
-                <el-input v-model="form.password" class="login-input" type="password" placeholder="Password"
+                <el-input v-model="form.password" class="password-input" type="password" placeholder="Password"
                     show-password />
             </el-form-item>
             <el-form-item>
@@ -18,7 +18,7 @@
             </el-form-item>
             <el-form-item>
                 <router-link to="/" class="login-button">
-                    <el-button type="default" class="cancel-button">Cancel</el-button>
+                    <el-button type="info" class="login-button">Cancel</el-button>
                 </router-link>
             </el-form-item>
         </el-form>
@@ -70,7 +70,7 @@ const handleLogin = async () => {
 <style scoped>
 .login-container {
     max-width: 400px;
-    margin: 50px auto;
+    margin: 50px auto 4.5rem;
     padding: 20px;
     border: 1px solid #dcdfe6;
     border-radius: 8px;
@@ -88,6 +88,11 @@ const handleLogin = async () => {
     margin-bottom: 15px;
 }
 
+.password-input {
+    width: 100%;
+    margin-bottom: 35px;
+}
+
 .login-button {
     width: 100%;
 }
@@ -96,20 +101,6 @@ const handleLogin = async () => {
     background-color: #ccc;
     border-color: #ccc;
     cursor: not-allowed;
-}
-
-.cancel-button {
-    width: 100%;
-    color: #4b0082; 
-    border: 1px solid #3d0066; 
-    background-color: transparent;
-    font-weight: 600;
-}
-
-.cancel-button:hover {
-    background-color: #f7e8ff; 
-    color: #4b0082; 
-    border-color: #4b0082; 
 }
 
 .loading-indicator {

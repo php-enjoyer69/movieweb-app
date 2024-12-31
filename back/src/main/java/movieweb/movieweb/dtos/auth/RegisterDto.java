@@ -18,10 +18,6 @@ public class RegisterDto
     @Size(min = 2, max = 50, message = "Imię musi mieć od 2 do 50 znaków")
     private String name;
 
-    @NotEmpty(message = "Nazwisko jest wymagane")
-    @Size(min = 2, max = 50, message = "Nazwisko musi mieć od 2 do 50 znaków")
-    private String surname;
-
     @NotEmpty(message = "Adres email jest wymagany")
     @Size(min = 2, max = 50, message = "Email musi mieć od 2 do 50 znaków")
     @Email(message = "Nieprawidłowy email")

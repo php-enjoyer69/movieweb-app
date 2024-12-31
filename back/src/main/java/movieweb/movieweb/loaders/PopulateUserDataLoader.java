@@ -31,7 +31,6 @@ public class PopulateUserDataLoader implements ApplicationRunner
     RegisterDto adminDto = RegisterDto.builder()
             .email("admin@mail.com")
             .name("admin")
-            .surname("admin")
             .password("zaq1@WSX")
             .passwordConfirmation("zaq1@WSX")
             .build();

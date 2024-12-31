@@ -16,9 +16,6 @@ public class PatchUserDto
     @Size(min = 2, max = 50, message = "Imię musi mieć od 2 do 50 znaków")
     private String name;
 
-    @Size(min = 2, max = 50, message = "Nazwisko musi mieć od 2 do 50 znaków")
-    private String surname;
-
     @Size(min = 2, max = 50, message = "Email musi mieć od 2 do 50 znaków")
     @Email(message = "Nieprawidłowy email")
     private String email;
