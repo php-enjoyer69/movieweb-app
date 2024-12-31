@@ -53,7 +53,7 @@ public class PopulateMovieDataLoader implements ApplicationRunner
                       .description("An interesting production")
                       .genres(movieGenres)
                       .year(Integer.valueOf("2010"))
-                      .rating(Double.valueOf("0"))
+                      .averageRating(Double.valueOf("0.0"))
                       .img("movie1.jpg")
                       .build(),
               movieGenres
@@ -81,7 +81,7 @@ public class PopulateMovieDataLoader implements ApplicationRunner
     createMovieGenre("Horror");
     createMovieGenre("Comedy");
     createMovieGenre("Romantic");
-    createMovieGenre("Sci-Fi");
+    createMovieGenre("Animation");
     createMovieGenre("Thriller");
     createMovieGenre("Fantasy");
   }

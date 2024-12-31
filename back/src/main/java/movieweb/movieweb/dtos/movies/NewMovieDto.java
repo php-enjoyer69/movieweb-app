@@ -30,9 +30,7 @@ public class NewMovieDto
   @Max(value = 2025, message = "Year must be at most 2025")
   private Integer year;
 
-  @DecimalMin(value = "0.0", inclusive = true, message = "Rating must be a non-negative number")
-  @DecimalMax(value = "10.0", inclusive = true, message = "Rating must be at most 10.0")
-  private Double rating; // Nullable field
+  private Double averageRating;
 
   @NotNull(message = "At least one genre is required")
   private Set<MovieGenre> genres;

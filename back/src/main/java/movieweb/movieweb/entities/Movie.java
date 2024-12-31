@@ -36,10 +36,8 @@ public class Movie
   @Max(value = 2025, message = "Year must be at most 2025")
   private Integer year;
 
-  @Column(name = "rating", nullable = true)
-  @DecimalMin(value = "0")
-  @DecimalMax(value = "10")
-  private double rating;
+  @Column(name = "average_rating")
+  private Double averageRating;
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(

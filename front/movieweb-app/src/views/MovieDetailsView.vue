@@ -81,14 +81,14 @@ onMounted(fetchMovie);
 <style scoped>
 .movie-detail-page {
   padding: 20px;
-  margin-left: 100px;
-  margin-right: 100px;
+  margin-left: 200px;
+  margin-right: 200px;
   background-color: #fff;
 }
 
 .el-link {
   margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   font-size: 16px;
   font-weight: 600;
   color: #333;

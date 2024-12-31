@@ -38,6 +38,8 @@ public class SecurityConfig
             .requestMatchers(HttpMethod.POST, "/login", "/register").anonymous()
                 .requestMatchers(HttpMethod.GET, "/users").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/user/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/user/{id}").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/user/{id}").permitAll()
 
             .requestMatchers(HttpMethod.GET, "/movies").permitAll()
             .requestMatchers(HttpMethod.GET, "/movie/{id}").permitAll()
@@ -45,10 +47,19 @@ public class SecurityConfig
             .requestMatchers(HttpMethod.PATCH, "/movie/{id}").permitAll()
             .requestMatchers(HttpMethod.DELETE, "/movie/{id}").permitAll()
 
+            .requestMatchers(HttpMethod.GET, "/movie-genres").permitAll()
+            .requestMatchers(HttpMethod.GET, "/movie-genre/{id}").permitAll()
+            .requestMatchers(HttpMethod.POST, "/movie-genre").permitAll()
+            .requestMatchers(HttpMethod.PATCH, "/movie-genre/{id}").permitAll()
+            .requestMatchers(HttpMethod.DELETE, "/movie-genre/{id}").permitAll()
+
             .requestMatchers(HttpMethod.GET, "/image/{name}").permitAll()
             .requestMatchers(HttpMethod.POST, "/image").permitAll()
             .requestMatchers(HttpMethod.PATCH, "/image/{name}").permitAll()
             .requestMatchers(HttpMethod.DELETE, "/image/{name}").permitAll()
+
+            .requestMatchers(HttpMethod.GET, "/movie/{movieId}/reviews").permitAll()
+            .requestMatchers(HttpMethod.POST, "/movie/{movieId}/review/{userId}").permitAll()
 
             .anyRequest().denyAll()
         );
