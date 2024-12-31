@@ -10,9 +10,7 @@ body {
     position: relative;
     min-height: 100vh;
     margin: 0;
-    padding-bottom: 3em;
     background-color: #f4f4f4;
-    ;
 }
 
 main {
@@ -31,7 +29,10 @@ main {
     --el-color-warning: #3c91e6;
     --el-color-error: #F56C6C;
     --el-color-info: #909399;
-    --el-color-pink: #ff81d7;
+    --pink: #ff81d7;
+    --logo: #9b4dca;
+    --light-purple: #d5a1ea;
+    --dark-gray: rgb(75, 75, 75);
 }
 
 .el-button {
@@ -48,10 +49,6 @@ main {
 
 .el-button:focus {
     box-shadow: 0 0 0 0.2rem #6a2a8c;
-}
-
-.close:hover {
-    color: #6a2a8c;
 }
 
 .page {
@@ -79,4 +76,81 @@ main {
     font-size: 15px;
     color: #6b6b6b;
     border-bottom: none;
+}
+
+.el-button--success {
+    background-color: var(--dark-gray);
+    border-color: var(--dark-gray);
+    color: white;
+}
+
+.el-button--success:hover {
+    background-color: var(--el-color-primary);
+    border-color: var(--el-color-primary);
+}
+
+.el-button--success:focus {
+    box-shadow: 0 0 0 0.2rem rgba(190, 108, 245, 0.5);
+}
+
+.el-button--danger {
+    background-color: var(--dark-gray);
+    border-color: var(--dark-gray);
+    color: white;
+}
+
+.el-button--danger:hover {
+    background-color: #f44336;
+    border-color: #f44336;
+}
+
+.el-button--danger:focus {
+    box-shadow: 0 0 0 0.2rem rgba(245, 108, 108, 0.5);
+}
+
+.el-button--warning {
+    background-color: #409EFF;
+    border-color: #409EFF;
+    color: white;
+}
+
+.el-button--warning:hover {
+    background-color: #66b1ff;
+    border-color: #66b1ff;
+}
+
+.el-button--warning:focus {
+    box-shadow: 0 0 0 0.2rem rgba(64, 158, 255, 0.5);
+}
+
+.el-button--info {
+    background-color: #909399;
+    border-color: #909399;
+    color: white;
+}
+
+.el-button--info:hover {
+    background-color: var(--dark-gray);
+    border-color: var(--dark-gray);
+}
+
+.el-button--info:focus {
+    box-shadow: 0 0 0 0.2rem rgba(144, 147, 153, 0.5);
+}
+
+.el-input__inner {
+    font-family: Quicksand;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.8em;
+    color: #333;
+    cursor: pointer;
+  }
+
+.close:hover {
+    color: #6a2a8c;
 }

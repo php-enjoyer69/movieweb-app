@@ -18,9 +18,9 @@ const goHome = () => {
 <style scoped>
 .about-page {
   max-width: 600px;
-  margin: 2rem auto;
+  margin: 2rem auto 14rem;
   padding: 2rem;
-  background-color: #f4f4f4;
+  background-color: #fff;
 }
 
 h1 {

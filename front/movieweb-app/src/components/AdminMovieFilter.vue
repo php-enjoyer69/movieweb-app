@@ -15,7 +15,8 @@
         </div>
         <div class="filter-item">
           <el-button type="primary" @click="clearFilters" class="clear-button">
-            Clear filters <Icon icon="ic:round-clear" style="margin-left: 5px; font-size: large;"/>
+            Clear filters
+            <Icon icon="ic:round-clear" style="margin-left: 5px; font-size: large;" />
           </el-button>
         </div>
       </div>
@@ -29,15 +30,15 @@
             <div class="year-range-container">
               <div class="year-input-group">
                 <div class="year-label">From</div>
-                <el-input v-model="filters.minYear" placeholder="1900" @input="onYearInputChange" class="year-input">
+                <el-input v-model="filters.minYear" placeholder="1888" @input="onYearInputChange" class="year-input">
                 </el-input>
               </div>
               <div class="year-input-group">
                 <div class="year-label">To</div>
-                <el-input v-model="filters.maxYear" placeholder="2025" @input="onYearInputChange" class="year-input">
+                <el-input v-model="filters.maxYear" placeholder="2024" @input="onYearInputChange" class="year-input">
                 </el-input>
               </div>
-              <el-slider v-model="yearRange" range :min="1900" :max="2025" step="1" @change="updateYearFilter"
+              <el-slider v-model="yearRange" range :min="1888" :max="2025" step="1" @change="updateYearFilter"
                 class="year-slider" :marks="marks" />
             </div>
           </div>
@@ -52,45 +53,12 @@
             <label class="filter-label">Genres</label>
             <el-select v-model="filters.genres" multiple filterable :reserve-keyword="false"
               placeholder="Choose movie genre" @change="applyFilters" class="genre-select">
-              <el-option v-for="genre in genres" :key="genre.id" :label="genre.name"
-                :value="genre.name" />
+              <el-option v-for="genre in genres" :key="genre.id" :label="genre.name" :value="genre.name" />
             </el-select>
           </div>
-
-          <el-divider></el-divider>
-
         </div>
       </el-collapse-item>
     </el-collapse>
-
-          <div class="filter-row sort-row">
-            <div class="filter-item">
-              <label class="filter-label">Sort</label>
-              <el-select v-model="filters.sortByPrice" placeholder="Choose an option" @change="applyFilters"
-                class="sort-select">
-                <el-option :label="sortOptions[0].label" :value="sortOptions[0].value">
-                  <el-icon class="sort-icon">
-                    <ArrowUp />
-                  </el-icon> {{ sortOptions[0].label }}
-                </el-option>
-                <el-option :label="sortOptions[1].label" :value="sortOptions[1].value">
-                  <el-icon class="sort-icon">
-                    <ArrowDown />
-                  </el-icon> {{ sortOptions[1].label }}
-                </el-option>
-                <el-option :label="sortOptions[2].label" :value="sortOptions[2].value">
-                  <el-icon class="sort-icon">
-                    <ArrowUp />
-                  </el-icon> {{ sortOptions[2].label }}
-                </el-option>
-                <el-option :label="sortOptions[3].label" :value="sortOptions[3].value">
-                  <el-icon class="sort-icon">
-                    <ArrowDown />
-                  </el-icon> {{ sortOptions[3].label }}
-                </el-option>
-              </el-select>
-            </div>
-          </div>
   </el-card>
 </template>
 
@@ -115,29 +83,22 @@ const filters = ref({
   genres: [],
 });
 
-const sortOptions = [
-  { label: 'Worst rated', value: 'ratingAsc', icon: ArrowUp },
-  { label: 'Best rated', value: 'ratingDesc', icon: ArrowDown },
-  { label: 'Oldest', value: 'yearAsc', icon: ArrowUp },
-  { label: 'Newest', value: 'yearDesc', icon: ArrowDown },
-];
-
 const emit = defineEmits(['updateFilters']);
 
 const applyFilters = () => {
   emit('updateFilters', filters.value);
 };
 
-const yearRange = ref([1900, 2025]);
+const yearRange = ref([1888, 2024]);
 
 const marks = {
-  1900: '1900',
+  1888: '1888',
   2025: '2025',
 };
 
 const clearFilters = () => {
   filters.value = { title: '', minYear: null, maxYear: null, sortByRating: null, sortByYear: null, genres: [] };
-  yearRange.value = [1900, 2025];
+  yearRange.value = [1888, 2025];
   applyFilters();
 };
 
@@ -145,22 +106,22 @@ const onYearInputChange = () => {
   if (filters.value.minYear > filters.value.maxYear && filters.value.maxYear !== null) {
     filters.value.minYear = filters.value.maxYear;
   }
-  if (filters.value.minYear < 1900) filters.value.minYear  = 1900;
-  if (filters.value.maxYear  > 2025) filters.value.maxYear  = 2025;
-  if (filters.value.minYear !== null && filters.value.maxYear  === null) {
-    filters.value.maxYear  = 2025;
+  if (filters.value.minYear < 1888) filters.value.minYear = 1888;
+  if (filters.value.maxYear > 2025) filters.value.maxYear = 2025;
+  if (filters.value.minYear !== null && filters.value.maxYear === null) {
+    filters.value.maxYear = 2025;
   }
-  yearRange.value = [filters.value.minYear , filters.value.maxYear];
+  yearRange.value = [filters.value.minYear, filters.value.maxYear];
   applyFilters();
 };
 
 const updateYearFilter = () => {
   if (yearRange.value[0] > yearRange.value[1]) {
-    filters.value.minYear  = yearRange.value[1];
-    filters.value.maxYear  = yearRange.value[0];
+    filters.value.minYear = yearRange.value[1];
+    filters.value.maxYear = yearRange.value[0];
   } else {
-    filters.value.minYear  = yearRange.value[0];
-    filters.value.maxYear  = yearRange.value[1];
+    filters.value.minYear = yearRange.value[0];
+    filters.value.maxYear = yearRange.value[1];
   }
 
   applyFilters();
@@ -201,7 +162,7 @@ const activeNames = ref(['0']);
 
 .advanced-search-collapse {
   margin-top: 20px;
-  
+
 }
 
 .advanced-search-section {
@@ -241,6 +202,7 @@ const activeNames = ref(['0']);
   width: 480px;
   font-family: Quicksand;
   font-weight: 500;
+  margin-bottom: 20px;
 }
 
 .year-slider {
