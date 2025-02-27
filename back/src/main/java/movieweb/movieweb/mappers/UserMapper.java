@@ -10,9 +10,11 @@ import org.mapstruct.*;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper
-{
+public interface UserMapper {
+
+    @Mapping(target = "role", source = "userRole")
     UserDto toUserDto(User user);
+
     List<UserDto> toUserDtoList(List<User> users);
 
     @Mapping(target = "password", ignore = true)
@@ -25,3 +27,7 @@ public interface UserMapper
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(@MappingTarget User user, PatchUserDto patchUserDto);
 }
+
+
+
+

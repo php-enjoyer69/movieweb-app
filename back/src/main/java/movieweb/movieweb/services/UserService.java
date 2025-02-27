@@ -1,5 +1,10 @@
 package movieweb.movieweb.services;
 
+import com.google.common.base.Joiner;
+import movieweb.movieweb.enums.SearchOperation;
+import movieweb.movieweb.enums.UserRole;
+import movieweb.movieweb.specifications.UserSpecificationsBuilder;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import movieweb.movieweb.dtos.auth.LoginDto;
 import movieweb.movieweb.dtos.auth.RegisterDto;
@@ -21,6 +26,9 @@ import org.springframework.stereotype.Service;
 import java.nio.CharBuffer;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service
@@ -46,19 +54,39 @@ public class UserService
         return new PageImpl<>(userDtos, users.getPageable(), users.getTotalElements());
     }
 
-    public Page<UserDto> findAll(Pageable pageable, String search)
-    {
-        String[] searchArray = search.split(",");
+    public Page<UserDto> findAll(Pageable pageable, String search) {
+        UserSpecificationsBuilder builder = new UserSpecificationsBuilder();
 
-        String searchParam = searchArray[0];
-        String searchValue = searchArray[1];
+        String operationSetExper = Joiner.on("|").join(SearchOperation.SIMPLE_OPERATION_SET);
+        Pattern pattern = Pattern.compile(
+                "(\\w+?)(" + operationSetExper + ")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),"
+        );
 
-        Page<UserDto> users = userRepository.findAll(searchParam, searchValue, pageable);
+        System.out.println("Raw search string: " + search);
 
-        return users;
+        if (search != null) {
+            Matcher matcher = pattern.matcher(search + ",");
+            while (matcher.find()) {
+
+                builder.with(
+                        matcher.group(1),
+                        matcher.group(2),
+                        matcher.group(4),
+                        matcher.group(3),
+                        matcher.group(5)
+                );
+            }
+        }
+
+        Specification<User> userSpecification = builder.build();
+        Page<User> users = userRepository.findAll(userSpecification, pageable);
+
+        List<UserDto> userDtos = userMapper.toUserDtoList(users.getContent());
+
+        return new PageImpl<>(userDtos, users.getPageable(), users.getTotalElements());
     }
 
-    public UserDto update(PatchUserDto patchUserDto, Long id)
+    public UserDto update(PatchUserDto patchUserDto, String img, Long id)
     {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
@@ -77,6 +105,7 @@ public class UserService
         }
 
         userMapper.update(user, patchUserDto);
+        user.setImg(img);
 
         User updatedUser = userRepository.save(user);
 
@@ -102,8 +131,7 @@ public class UserService
         return userMapper.toUserDto(user);
     }
 
-    public UserDto register(RegisterDto registerDto) throws MethodArgumentNotValidException
-    {
+    public UserDto register(RegisterDto registerDto) throws MethodArgumentNotValidException {
         Optional<User> existingUser = userRepository.findByEmail(registerDto.getEmail());
 
         if (existingUser.isPresent())
@@ -112,7 +140,12 @@ public class UserService
         if (!registerDto.getPassword().equals(registerDto.getPasswordConfirmation()))
             throw ExceptionUtils.createValidationException("passwordConfirmation", "Passwords do not match");
 
+        UserRole role = registerDto.getRole() != null ? registerDto.getRole() : UserRole.USER;
+
         User user = userMapper.registerToUser(registerDto);
+
+        user.setUserRole(role);
+
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(registerDto.getPassword())));
 
         User savedUser = userRepository.save(user);
@@ -126,5 +159,26 @@ public class UserService
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
 
         return user;
+    }
+
+    public UserDto save(PatchUserDto patchUserDto) {
+        User user = new User();
+
+        if (patchUserDto.getEmail() != null && !patchUserDto.getEmail().isEmpty()) {
+            Optional<User> existingUser = userRepository.findByEmail(patchUserDto.getEmail());
+            if (existingUser.isPresent()) {
+                throw new AppException("This email address is already in use", HttpStatus.BAD_REQUEST);
+            }
+            user.setEmail(patchUserDto.getEmail());
+        }
+
+        if (patchUserDto.getPassword() != null && !patchUserDto.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(CharBuffer.wrap(patchUserDto.getPassword())));
+        }
+
+        user.setImg(patchUserDto.getImg());
+
+        User savedUser = userRepository.save(user);
+        return userMapper.toUserDto(savedUser);
     }
 }

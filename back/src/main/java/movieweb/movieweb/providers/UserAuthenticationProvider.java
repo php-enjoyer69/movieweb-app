@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import movieweb.movieweb.dtos.users.UserDto;
 import movieweb.movieweb.entities.User;
+import movieweb.movieweb.enums.UserRole;
 import movieweb.movieweb.mappers.UserMapper;
 import movieweb.movieweb.services.UserService;
 import jakarta.annotation.PostConstruct;
@@ -22,8 +23,7 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 @Component
-public class UserAuthenticationProvider
-{
+public class UserAuthenticationProvider {
     @Value("${security.jwt.token.secret-key:secret-key}")
     private String secretKey;
 
@@ -31,34 +31,32 @@ public class UserAuthenticationProvider
     private final UserMapper userMapper;
 
     @PostConstruct
-    protected void init()
-    {
+    protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String login)
-    {
+    public String createToken(String login, UserRole role) {
+
         Date now = new Date();
-        Date validity = new Date(now.getTime() + 3600000);
+        Date validity = new Date(now.getTime() + 3600000); // 1 hour validity
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
         return JWT.create()
                 .withSubject(login)
+                .withClaim("role", role.name())
                 .withIssuedAt(now)
                 .withExpiresAt(validity)
                 .sign(algorithm);
     }
 
-    public Authentication validateToken(String token)
-    {
+    public Authentication validateToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         JWTVerifier verifier = JWT.require(algorithm).build();
 
         User user = null;
 
-        if (!isTokenExpired(verifier, token))
-        {
+        if (!isTokenExpired(verifier, token)) {
             DecodedJWT decoded = verifier.verify(token);
             user = userService.findByEmail(decoded.getSubject());
         }
@@ -66,22 +64,17 @@ public class UserAuthenticationProvider
         return new UsernamePasswordAuthenticationToken(user, null);
     }
 
-    public boolean isTokenExpired(JWTVerifier verifier, String token)
-    {
-        try
-        {
+    public boolean isTokenExpired(JWTVerifier verifier, String token) {
+        try {
             DecodedJWT decoded = verifier.verify(token);
-        }
-        catch (JWTVerificationException e)
-        {
+        } catch (JWTVerificationException e) {
             return true;
         }
 
         return false;
     }
 
-    public UserDto getAuthenticatedUserDto()
-    {
+    public UserDto getAuthenticatedUserDto() {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         return userMapper.toUserDto(user);

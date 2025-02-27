@@ -13,13 +13,15 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PatchUserDto
 {
-    @Size(min = 2, max = 50, message = "Imię musi mieć od 2 do 50 znaków")
+    @Size(min = 2, max = 50, message = "Username must be from 2 to 50 characters long")
     private String name;
 
-    @Size(min = 2, max = 50, message = "Email musi mieć od 2 do 50 znaków")
-    @Email(message = "Nieprawidłowy email")
+    @Size(min = 2, max = 50, message = "Email must be from 2 to 50 characters long")
+    @Email(message = "Invalid email address")
     private String email;
 
-    @Size(min = 8, max = 100, message = "Hasło musi mieć od 8 do 100 znaków")
+    @Size(min = 8, max = 100, message = "Password must be from 8 to 100 characters long")
     private String password;
+
+    private String img;
 }

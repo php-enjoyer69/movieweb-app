@@ -7,6 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import movieweb.movieweb.enums.UserRole;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,4 +36,16 @@ public class User
     @Column(name = "password", nullable = false)
     @Size(min = 8, max = 100)
     private String password;
+
+    @Column(name = "img")
+    private String img;
+
+    @OneToMany(mappedBy = "user")
+    private Set<FavoriteMovie> favoriteMovies;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<WatchlistMovie> watchlistMovies = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
 }

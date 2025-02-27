@@ -3,10 +3,7 @@ package movieweb.movieweb.repositories;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +13,7 @@ import movieweb.movieweb.dtos.users.UserDto;
 import movieweb.movieweb.entities.User;
 import movieweb.movieweb.mappers.UserMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -26,45 +24,43 @@ public class UserRepositoryImpl implements UserRepositoryCustom
   UserMapper userMapper;
 
   @Override
-  public Page<UserDto> findAll(String searchParam, String searchValue, Pageable pageable)
-  {
+  public Page<UserDto> findAll(String searchParam, String searchValue, Pageable pageable) {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
     Root<User> user = criteriaQuery.from(User.class);
 
-    Expression serachColumn = user.get(searchParam);
-    Class columnType = user.get(searchParam).getModel().getBindableJavaType();
+    List<Predicate> predicates = new ArrayList<>();
 
+    // Handle multiple search parameters if provided
+    String[] params = searchParam.split(",");
+    String[] values = searchValue.split(",");
 
-    criteriaQuery.select(user);
+    for (int i = 0; i < params.length; i++) {
+      String param = params[i];
+      String value = values[i];
 
-    if (columnType.isAssignableFrom(String.class))
-      criteriaQuery.where(
-        criteriaBuilder.like(
-          serachColumn,
-          "%" + searchValue + "%"
-        )
-      );
-    else
-      criteriaQuery.where(
-        criteriaBuilder.equal(
-          serachColumn,
-          searchValue
-        )
-      );
+      Expression<?> searchColumn = user.get(param);
+      Class<?> columnType = user.get(param).getModel().getBindableJavaType();
 
-    criteriaQuery.orderBy(
-      QueryUtils.toOrders(
-        pageable.getSort(),
-        user,
-        criteriaBuilder
-      )
-    );
+      if (columnType.isAssignableFrom(String.class)) {
+        predicates.add(
+                criteriaBuilder.like(searchColumn.as(String.class), "%" + value + "%")
+        );
+      } else {
+        predicates.add(
+                criteriaBuilder.equal(searchColumn, value)
+        );
+      }
+    }
+
+    criteriaQuery.select(user)
+            .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
+    criteriaQuery.orderBy(QueryUtils.toOrders(pageable.getSort(), user, criteriaBuilder));
 
     TypedQuery<User> query = entityManager.createQuery(criteriaQuery);
 
     int count = query.getResultList().size();
-
     query.setMaxResults(pageable.getPageSize());
     query.setFirstResult((int) pageable.getOffset());
 
