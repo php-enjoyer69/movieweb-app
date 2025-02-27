@@ -9,6 +9,14 @@ import MovieDetailsView from '@/views/MovieDetailsView.vue';
 import UserManagement from '@/views/UserManagement.vue';
 import ProfileView from '@/views/ProfileView.vue';
 import MovieManagement from '@/views/MovieManagement.vue';
+import ReviewManagement from '@/views/ReviewManagement.vue';
+import TrendingNowView from '@/views/TrendingNowView.vue';
+import PersonsView from '@/views/PersonsView.vue';
+import PersonDetailsView from '@/views/PersonDetailsView.vue';
+import PersonManagement from '@/views/PersonManagement.vue';
+import TopCelebritiesView from '@/views/TopCelebritiesView.vue';
+import ProfilePublicView from '@/views/ProfilePublicView.vue';
+import CommentManagement from '@/views/CommentManagement.vue';
 
 const routes = [
   {
@@ -66,6 +74,50 @@ const routes = [
     component: MovieManagement,
     meta: { requiresAuth: true, requiresAdmin: true }, 
   },
+  {
+    path: '/admin/manage-reviews',
+    name: 'manage-reviews',
+    component: ReviewManagement,
+    meta: { requiresAuth: true, requiresAdmin: true }, 
+  },
+  {
+    path: '/trending-now',
+    name: 'trending-now',
+    component: TrendingNowView,
+  },
+  {
+    path: '/people',
+    name: 'persons',
+    component: PersonsView,
+  },
+  {
+    path: '/person/:id',
+    name: 'person-details',
+    component: PersonDetailsView,
+    props: true
+  },
+  {
+    path: '/admin/manage-persons',
+    name: 'manage-persons',
+    component: PersonManagement,
+    meta: { requiresAuth: true, requiresAdmin: true }, 
+  },
+  {
+    path: '/top-celebrities',
+    name: 'top-celebrities',
+    component: TopCelebritiesView,
+  },
+  {
+    path: '/profile/:id',
+    name: 'public-profile',
+    component: ProfilePublicView,
+  },
+  {
+    path: '/admin/manage-comments',
+    name: 'manage-comments',
+    component: CommentManagement,
+    meta: { requiresAuth: true, requiresAdmin: true }, 
+  },
 ];
 
 const router = createRouter({
@@ -80,7 +132,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     if (!user) {
       next('/login');
-    } else if (to.meta.requiresAdmin && user.email !== 'admin@mail.com') {
+    } else if (to.meta.requiresAdmin && user.role !== 'ADMIN') {
       console.log('Access denied: not an admin.');
       next('/');
     } else {

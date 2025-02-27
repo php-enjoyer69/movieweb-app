@@ -1,22 +1,46 @@
 <template>
   <div class="admin-panel">
-    <el-card class="admin-card" shadow="hover">
+    <el-card class="admin-card" shadow="false">
       <h1 class="card-title">Admin Panel</h1>
       <div class="button-container">
         <router-link to="/admin/manage-movies" class="link">
           <div class="center">
-            <Icon icon="mdi:movie-edit-outline" class="icon icon-pink" />
-            <el-button class="button-pink">
+            <Icon icon="mdi:movie-edit-outline" class="icon" />
+            <el-link :underline="false" class="link-text">
               <span>Manage movies</span>
-            </el-button>
+            </el-link>
+          </div>
+        </router-link>
+        <router-link to="/admin/manage-persons" class="link">
+          <div class="center">
+            <Icon icon="mdi:star-circle" class="icon" />
+            <el-link :underline="false" class="link-text">
+              <span>Manage celebrities</span>
+            </el-link>
+          </div>
+        </router-link>
+        <router-link to="/admin/manage-reviews" class="link">
+          <div class="center">
+            <Icon icon="mdi:comment-edit-outline" class="icon" />
+            <el-link :underline="false" class="link-text">
+              <span>Manage reviews</span>
+            </el-link>
           </div>
         </router-link>
         <router-link to="/admin/manage-users" class="link">
           <div class="center">
-            <Icon icon="mdi:account-plus" class="icon icon-purple" />
-            <el-button class="button-purple">
+            <Icon icon="mdi:account-plus" class="icon" />
+            <el-link :underline="false" class="link-text">
               <span>Manage users</span>
-            </el-button>
+            </el-link>
+          </div>
+        </router-link>
+        <router-link to="/admin/manage-comments" class="link">
+          <div class="center">
+            <Icon icon="mdi:comment-outline" class="icon" />
+            <el-link :underline="false" class="link-text">
+              <span>Manage comments</span>
+            </el-link>
           </div>
         </router-link>
       </div>
@@ -30,98 +54,65 @@ import { Icon } from '@iconify/vue';
 
 <style scoped>
 .admin-panel {
-display: flex;
-justify-content: center;
-align-items: center;
-min-height: 50vh;
-margin-bottom: 20rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  margin-bottom: 20rem;
 }
 
 .admin-card {
-width: 800px;
-padding: 5px;
-border-radius: 8px;
+  width: 800px;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: none;
 }
 
 .card-title {
-text-align: center;
-margin-bottom: 30px;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 .button-container {
-display: flex;
-justify-content: center;
-gap: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
 }
 
-.button-pink {
-background-color: #ff81d7;
-border-color: #ff81d7;
-color: white;
+.el-link {
+  color: #551a8b;
+  font-size: 16px;
+  font-family: "Quicksand", sans-serif;
 }
 
-.button-pink:hover {
-background-color: #e770bf;
-border-color: #e770bf;
-color: white;
-}
-
-.button-purple {
-background-color: #9B59B6;
-border-color: #9B59B6;
-color: white;
-}
-
-.button-purple:hover {
-background-color: #8E44AD;
-border-color: #8E44AD;
-color: white;
-}
-
-.close:hover {
-color: #e770bf;
-}
-
-.el-button {
-font-family: "Quicksand", sans-serif;
-outline: none;
-}
-
-.el-button .iconify {
-margin-right: 8px;
-}
-
-.el-button:focus {
-box-shadow: 0 0 0 0.2rem rgba(255, 129, 215, 0.5);
-}
-
-.el-pagination {
-display: flex;
-justify-content: center;
-margin-top: 1em;
+.el-link:hover {
+  color: #3a1063;
 }
 
 .center {
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-gap: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 150px;
 }
 
 .icon {
-font-size: 50px;
+  font-size: 50px;
+  color: #551a8b;
 }
 
-.link{
-text-decoration: none;
+.link {
+  text-decoration: none;
 }
 
-.icon-pink {
-color: #ff81d7;
+.link-text {
+  color: #551a8b;
 }
 
-.icon-purple {
-color: #9B59B6;
+.link-text:hover {
+  color: #3a1063;
 }
 </style>

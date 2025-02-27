@@ -6,13 +6,11 @@
         :page-size="itemsPerPage"
         :current-page="currentPage"
         @current-change="onPageChange"
-        background
       />
     </div>
   </template>
   
   <script setup>
-  import { defineProps, defineEmits } from 'vue';
   
   const props = defineProps({
     currentPage: {

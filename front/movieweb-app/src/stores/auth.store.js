@@ -15,37 +15,40 @@ export const useAuthStore = defineStore({
         async login(email, password) {
             let user = null;
             try {
-                const response = await axios.post('http://localhost:8000/login', {
-                    email,
-                    password
-                });
-                user = await response.data;
+                const response = await axios.post('/api/login', { email, password });
+
+                user = response.data;
+
+                localStorage.setItem('user', JSON.stringify(user)); 
+
+                axios.defaults.headers['Authorization'] = `Bearer ${user.token}`;
+        
             } catch (err) {
                 throw err;
-
             }
-
-            this.user = await user;
-            localStorage.setItem('user', JSON.stringify(user));
-
+        
+            this.user = user; 
         },
         logout() {
             this.user = null;
             localStorage.removeItem('user');
-
+            delete axios.defaults.headers['Authorization'];
         },
-        async register(email, password, name, passwordConfirmation) {
+        async register(email, password, name, passwordConfirmation, role) {
             try {
-                await axios.post('http://localhost:8000/register', {
+                const response = await axios.post('/api/register', {
                     email,
                     password,
                     name,
-                    passwordConfirmation
+                    passwordConfirmation,
+                    role
                 });
+                console.log('Register response:', response);
             } catch (err) {
+                console.error('Error during registration:', err.response ? err.response.data : err); 
                 throw err;
             }
-
-        }
-    }
+        },
+  }
+  
 });

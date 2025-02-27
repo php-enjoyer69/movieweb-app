@@ -11,6 +11,7 @@ body {
     min-height: 100vh;
     margin: 0;
     background-color: #f4f4f4;
+    overflow: hidden;
 }
 
 main {
@@ -30,6 +31,7 @@ main {
     --el-color-error: #F56C6C;
     --el-color-info: #909399;
     --pink: #ff81d7;
+    --hot-pink: #f02ac4;
     --logo: #9b4dca;
     --light-purple: #d5a1ea;
     --dark-gray: rgb(75, 75, 75);
@@ -79,14 +81,14 @@ main {
 }
 
 .el-button--success {
-    background-color: var(--dark-gray);
-    border-color: var(--dark-gray);
+    background-color: #333;
+    border-color: #333;
     color: white;
 }
 
 .el-button--success:hover {
-    background-color: var(--el-color-primary);
-    border-color: var(--el-color-primary);
+    background-color: #242424;
+    border-color: #242424;
 }
 
 .el-button--success:focus {
@@ -149,8 +151,63 @@ main {
     font-size: 1.8em;
     color: #333;
     cursor: pointer;
-  }
+}
 
 .close:hover {
     color: #6a2a8c;
+}
+
+.el-button.is-active,
+.el-button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.slide-up-enter,
+.slide-up-leave-to {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.slide-up-enter-to,
+.slide-up-leave {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.el-link:hover {
+    text-decoration: none !important;
+    border: none !important;
+    outline: none !important;
+} 
+
+.el-menu--horizontal.el-menu {
+    border-bottom: none;
+}
+
+.el-message {
+    background-color: #333!important;
+    border-color: #333 !important;
+}
+
+.el-message__content {
+    color: #fff !important;
+}
+
+.el-input__inner {
+    font-weight: 600;
+}
+
+.el-textarea__inner {
+    font-weight: 400;
+}
+
+.el-select-dropdown__item.is-selected {
+    color: #444;
+    font-weight: 400; 
 }

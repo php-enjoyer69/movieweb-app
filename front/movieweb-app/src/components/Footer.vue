@@ -4,7 +4,7 @@
       <div class="footer-links">
         <a href="/" class="footer-link">Home</a>
         <a href="/movies" class="footer-link">Movies</a>
-        <a href="/about" class="footer-link">About</a>
+        <a href="/people" class="footer-link">Celebrities</a>
         <a href="/profile" class="footer-link">My Profile</a>
       </div>
 
@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <p class="footer-text">2024 MovieWeb. All Rights Reserved.</p>
+    <p class="footer-text">2025 MovieWeb. All Rights Reserved.</p>
   </footer>
 </template>
 
@@ -33,24 +33,12 @@ import { Icon } from '@iconify/vue';
 </script>
 
 <style scoped>
-body {
-    font-family: 'Lexend', cursive;
-    position: relative;
-    min-height: 100vh;
-    margin: 0;
-    display: flex;
-    flex-direction: column; 
-    background-color: #f4f4f4;
-    z-index: -1
-}
-
 .footer {
-    background-color: #ececec;
-    color: var(--el-color-primary);
-    text-align: center;
-    padding: 2rem 0;
-    width: 100%;
-    margin-top: auto;  
+  background-color: #ececec;
+  color: var(--el-color-primary);
+  text-align: center;
+  padding: 2rem 0;
+  width: 100%;
 }
 
 .footer-content {
