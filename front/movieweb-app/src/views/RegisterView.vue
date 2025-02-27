@@ -70,7 +70,7 @@ const handleRegister = async () => {
         form.value.password = "";
         form.value.name = '';
         form.value.passwordConfirmation = '';
-        router.push('/');
+        router.push('/login');
     } catch (err) {
         error.value = err.response.data.errors;
     } finally {
