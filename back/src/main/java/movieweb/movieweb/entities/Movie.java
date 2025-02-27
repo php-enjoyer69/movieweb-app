@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,8 +16,8 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "movies")
-public class Movie
-{
+public class Movie {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -39,6 +38,9 @@ public class Movie
   @Column(name = "average_rating")
   private Double averageRating;
 
+  @Column(name = "rating_count")
+  private Integer ratingCount = 0;
+
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
           name = "movie_genre_map",
@@ -46,6 +48,9 @@ public class Movie
           inverseJoinColumns = @JoinColumn(name = "genre_id")
   )
   private Set<MovieGenre> genres = new HashSet<>();
+
+  @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  private Set<PersonMovieRole> roles = new HashSet<>();
 
   @Column(name = "img", nullable = false)
   private String img;

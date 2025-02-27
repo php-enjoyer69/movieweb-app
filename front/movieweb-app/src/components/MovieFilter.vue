@@ -14,8 +14,8 @@
           </el-input>
         </div>
         <div class="filter-item">
-          <el-button type="primary" @click="clearFilters" class="clear-button">
-            Clear filters <Icon icon="ic:round-clear" style="margin-left: 5px; font-size: large;"/>
+          <el-button type="success" @click="clearFilters" class="clear-button">
+            Clear filters <Icon icon=codicon:clear-all style="margin-left: 5px; font-size: large; color: #9b4dca;"/>
           </el-button>
         </div>
       </div>
@@ -24,8 +24,18 @@
     <el-collapse v-model="activeNames" class="advanced-search-collapse">
       <el-collapse-item name="1" title="Advanced Search">
         <div class="advanced-search-section">
+          <!-- <div class="filter-item">
+            <label class="filter-label">Person</label>
+            <el-input
+    v-model="filters.personName"
+    placeholder="Enter person's name or surname"
+    clearable
+    @input="applyFilters"
+    class="person-input"
+  />
+</div> -->
           <div class="filter-year-range">
-            <label class="filter-label">Year of production</label>
+            <label class="filter-label">Year of premiere</label>
             <div class="year-range-container">
               <div class="year-input-group">
                 <div class="year-label">From</div>
@@ -88,6 +98,11 @@
                     <ArrowDown />
                   </el-icon> {{ sortOptions[3].label }}
                 </el-option>
+                <el-option :label="sortOptions[4].label" :value="sortOptions[4].value">
+                  <el-icon class="sort-icon">
+                    <ArrowDown />
+                  </el-icon> {{ sortOptions[4].label }}
+                </el-option>
               </el-select>
             </div>
           </div>
@@ -113,19 +128,27 @@ const filters = ref({
   sortByRating: null,
   sortByYear: null,
   genres: [],
+  personName: '',
 });
 
 const sortOptions = [
-  { label: 'Worst rated', value: 'ratingAsc', icon: ArrowUp },
-  { label: 'Best rated', value: 'ratingDesc', icon: ArrowDown },
+  { label: 'Worst rated', value: 'averageRatingAsc', icon: ArrowUp },
+  { label: 'Best rated', value: 'averageRatingDesc', icon: ArrowDown },
   { label: 'Oldest', value: 'yearAsc', icon: ArrowUp },
   { label: 'Newest', value: 'yearDesc', icon: ArrowDown },
+  { label: 'Most rated', value: 'ratingCountDesc', icon: ArrowDown },
 ];
 
 const emit = defineEmits(['updateFilters']);
 
 const applyFilters = () => {
-  emit('updateFilters', filters.value);
+  emit('updateFilters', {
+    ...filters.value,
+    sortByRating: filters.value.sortByPrice === 'averageRatingAsc' || filters.value.sortByPrice === 'averageRatingDesc' ? filters.value.sortByPrice : null,
+    sortByYear: filters.value.sortByPrice === 'yearAsc' || filters.value.sortByPrice === 'yearDesc' ? filters.value.sortByPrice : null,
+    sortByPopularity: filters.value.sortByPrice === 'ratingCountDesc' ? filters.value.sortByPrice : null,
+    person: filters.value.personName,
+  });
 };
 
 const yearRange = ref([1900, 2025]);
@@ -136,7 +159,7 @@ const marks = {
 };
 
 const clearFilters = () => {
-  filters.value = { title: '', minYear: null, maxYear: null, sortByRating: null, sortByYear: null, genres: [] };
+  filters.value = { title: '', minYear: null, maxYear: null, sortByRating: null, sortByYear: null, sortByPopularity: null, genres: [], person: '' };
   yearRange.value = [1900, 2025];
   applyFilters();
 };
@@ -255,7 +278,7 @@ const activeNames = ref(['0']);
 }
 
 .clear-button {
-  max-width: 180px;
+  max-width: 160px;
   align-self: left;
   margin-top: 24px;
 }

@@ -26,8 +26,28 @@ public class ReviewDto {
     @DecimalMax(value = "10.0", inclusive = true, message = "Rating must be at most 10.0")
     private Double rating;
 
-    @Size(max = 5000)
+    @Size(max = 5000, message = "Content must be less than or equal to 5000 characters")
     private String content;
 
     private Date createdAt;
+
+    private String userName;
+
+    private String movieTitle;
+
+    private Integer movieYear;
+
+    private String movieImage;
+
+    private String movieId;
+
+    private Long userId;
+
+    private String userImg;
+
+    private Boolean wantsToWatchAgain;
+
+    private int likeCount;
+
+    private int dislikeCount;
 }

@@ -8,7 +8,13 @@ import lombok.RequiredArgsConstructor;
 import movieweb.movieweb.dtos.movies.MovieDto;
 import movieweb.movieweb.dtos.movies.NewMovieDto;
 import movieweb.movieweb.dtos.movies.PatchMovieDto;
+import movieweb.movieweb.dtos.roles.RoleAssignmentRequest;
 import movieweb.movieweb.entities.Movie;
+import movieweb.movieweb.entities.Person;
+import movieweb.movieweb.entities.PersonMovieRole;
+import movieweb.movieweb.enums.Role;
+import movieweb.movieweb.repositories.PersonMovieRoleRepository;
+import movieweb.movieweb.repositories.PersonRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +29,7 @@ import movieweb.movieweb.specifications.MovieSpecificationsBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +39,9 @@ public class MovieService
 {
   private final MovieRepository movieRepository;
   private final MovieMapper movieMapper;
+  private final PersonRepository personRepository;
+  private final PersonMovieRoleService personMovieRoleService;
+  private final PersonMovieRoleRepository personMovieRoleRepository;
   @PersistenceContext
   EntityManager entityManager;
 
@@ -134,4 +144,39 @@ public class MovieService
 
     return movie;
   }
+
+  @Transactional
+  public PersonMovieRole assignRoleToMovie(Long movieId, Long personId, Role role) {
+    Movie movie = movieRepository.findById(movieId)
+            .orElseThrow(() -> new AppException("Unknown movie", HttpStatus.NOT_FOUND));
+
+    Person person = personRepository.findById(personId)
+            .orElseThrow(() -> new AppException("Unknown person", HttpStatus.NOT_FOUND));
+
+    PersonMovieRole personMovieRole = new PersonMovieRole();
+    personMovieRole.setMovie(movie);
+    personMovieRole.setPerson(person);
+    personMovieRole.setRole(role);
+
+    return personMovieRoleService.addPersonMovieRole(personMovieRole);
+  }
+
+  @Transactional
+  public void assignRolesToMovie(Long movieId, List<RoleAssignmentRequest> roles) {
+    Movie movie = movieRepository.findById(movieId)
+            .orElseThrow(() -> new AppException("Unknown movie", HttpStatus.NOT_FOUND));
+
+    for (RoleAssignmentRequest request : roles) {
+      Person person = personRepository.findById(request.getPersonId())
+              .orElseThrow(() -> new AppException("Unknown person", HttpStatus.NOT_FOUND));
+
+      PersonMovieRole personMovieRole = new PersonMovieRole();
+      personMovieRole.setMovie(movie);
+      personMovieRole.setPerson(person);
+      personMovieRole.setRole(request.getRole());
+
+      personMovieRoleRepository.save(personMovieRole);
+    }
+  }
+
 }

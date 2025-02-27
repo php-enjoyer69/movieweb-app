@@ -5,14 +5,14 @@
     </el-link>
 
     <el-button-group class="navigation-buttons">
-      <el-button type="primary" @click="goToPreviousMovie">
+      <el-button type="success" @click="goToPreviousMovie">
         <el-icon class="button-icon">
           <Icon icon="mdi:chevron-left" />
         </el-icon>
         Previous Movie
       </el-button>
 
-      <el-button type="primary" @click="goToNextMovie">
+      <el-button type="success" @click="goToNextMovie">
         Next Movie
         <el-icon class="button-icon button-icon--right">
           <Icon icon="mdi:chevron-right" />
@@ -20,7 +20,7 @@
       </el-button>
     </el-button-group>
 
-    <div v-if="loading">Loading...</div>
+    <Skeleton v-if="loading" :rows="10" :animated="true" />
     <div v-else-if="error">{{ error }}</div>
 
     <MovieDetails v-else :movie="movie" :user="user" />
@@ -35,6 +35,7 @@ import { Icon } from '@iconify/vue';
 import { ElButtonGroup, ElButton, ElIcon } from 'element-plus';
 import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue';
 import MovieDetails from '@/components/MovieDetails.vue';
+import Skeleton from '@/components/Skeleton.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -95,8 +96,13 @@ onMounted(fetchMovie);
 }
 
 .navigation-buttons {
-  display: block;
+  display: flex;
   margin-top: 5px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
+  width: 23.5%;
+}
+
+.el-button {
+  flex: 1;
 }
 </style>

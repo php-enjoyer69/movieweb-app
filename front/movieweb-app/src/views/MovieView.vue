@@ -5,7 +5,7 @@
     <div class="movie-list">
       <MovieFilter @updateFilters="updateFilters" :genres="genres" />
 
-      <div v-if="loading">Loading...</div>
+      <Skeleton v-if="loading" :rows="10" :animated="true" />
       <div v-else-if="error">{{ error }}</div>
 
       <div v-else-if="movies.length === 0">
@@ -32,12 +32,13 @@ import MovieFilter from '@/components/MovieFilter.vue';
 import Movie from '@/components/Movie.vue';
 import Pagination from '@/components/Pagination.vue';
 import { ElNotification } from 'element-plus';
+import Skeleton from '@/components/Skeleton.vue'
 
 const movies = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const currentPage = ref(1);
-const itemsPerPage = ref(5);
+const itemsPerPage = ref(10);
 const totalPages = ref(0);
 const totalElements = ref(0);
 const genres = ref([]);
@@ -48,7 +49,9 @@ const filters = ref({
   maxYear: null,
   sortByRating: null,
   sortByYear: null,
+  sortByPopularity: null,
   genres: [],
+  personName: '',
 });
 
 const route = useRoute();
@@ -68,6 +71,9 @@ const buildSearchQuery = () => {
     const genreQueries = filters.value.genres.map((genre) => `genres;${genre}`);
     queries.push(`(${genreQueries.join(',')})`);
   }
+  if (filters.value.personName) {
+    queries.push(`person_movie_roles.person.name:*${filters.value.personName}*`);
+  }
 
   return queries.join(',');
 };
@@ -78,14 +84,16 @@ const fetchData = async (page) => {
     const searchQuery = buildSearchQuery();
 
     const sortOrder =
-      filters.value.sortByRating === 'ratingAsc'
-        ? 'rating,asc'
-        : filters.value.sortByRating === 'ratingDesc'
-        ? 'rating,desc'
+      filters.value.sortByRating === 'averageRatingAsc'
+        ? 'averageRating,asc'
+        : filters.value.sortByRating === 'averageRatingDesc'
+        ? 'averageRating,desc'
         : filters.value.sortByYear === 'yearAsc'
         ? 'year,asc'
         : filters.value.sortByYear === 'yearDesc'
         ? 'year,desc'
+        : filters.value.sortByPopularity === 'ratingCountDesc'
+        ? 'ratingCount,desc'
         : 'id,asc';
 
     const response = await axios.get('/api/movies', {
@@ -107,6 +115,7 @@ const fetchData = async (page) => {
     loading.value = false;
   }
 };
+
 
 const fetchGenres = async () => {
   try {
@@ -171,21 +180,19 @@ h3 {
 }
 
 .movie-grid {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px; 
   padding: 0;
 }
 
 .movie-item {
-  flex: 1 1 auto;
-  max-width: calc(100% / 5);
-  margin: 0 5px;
   box-sizing: border-box;
+  margin: 0;
 }
 
 .movie-item:first-child {
-  margin-left: 10px;
+  margin-left: 0;
 }
 
 .movie-item:last-child {

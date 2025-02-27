@@ -1,12 +1,6 @@
 <template>
   <div class="flex gap-2" v-if="genres && genres.length">
-    <el-tag
-      v-for="genre in genres"
-      :key="genre.id"
-      :class="getTagClass(genre.id)" 
-      effect="dark"
-      round
-    >
+    <el-tag v-for="genre in genres" :key="genre.id" :class="getTagClass(genre.id)" effect="dark" round>
       {{ genre.name }}
     </el-tag>
   </div>
@@ -24,16 +18,10 @@ const props = defineProps({
 
 const getTagClass = (genreId) => {
   const genreClasses = {
-    1: 'tag-purple',
-    2: 'tag-dark-purple',
-    3: 'tag-light-purple',
-    4: 'tag-indigo',
-    5: 'tag-pink',
-    6: 'tag-default',
-    7: 'tag-dark-gray'
   };
 
-  return genreClasses[genreId] || 'tag-default';
+  return genreClasses[genreId] || 'tag-purple';
+
 };
 </script>
 
@@ -41,6 +29,7 @@ const getTagClass = (genreId) => {
 .flex {
   display: flex;
   gap: 0.2rem;
+  margin-bottom: 40px;
 }
 
 .tag-purple {
@@ -75,6 +64,12 @@ const getTagClass = (genreId) => {
   background-color: #f0f0f0;
   border-color: #d9d9d9;
   color: #343a40;
+}
+
+.trending-now-page .tag-default {
+  background-color: #303135;
+  border-color: #171717;
+  color: white;
 }
 
 .tag-dark-gray {

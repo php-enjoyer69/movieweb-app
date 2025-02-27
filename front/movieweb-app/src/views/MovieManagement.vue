@@ -7,30 +7,65 @@
     </router-link>
     <h2>Manage movies</h2>
 
-    <el-button @click="openModal" type="primary" class="add-product-btn" :icon="Plus">Add new movie</el-button>
+    <el-button @click="openMovieModal" type="success" class="add-product-btn">
+      <Icon icon="mdi:plus" style="margin-right: 4px; font-size: large; color: #9b4dca;" /> New movie
+    </el-button>
+
+    <el-button @click="openGenreModal" type="success" class="add-product-btn" >
+      <Icon icon="mdi:plus" style="margin-right: 4px; font-size: large; color: #9b4dca;" /> New movie genre
+    </el-button>
+    
+    <el-button @click="openRoleModal" type="success" class="add-product-btn" >
+      <Icon icon="mdi:plus" style="margin-right: 4px; font-size: large; color: #9b4dca;" /> New roles
+    </el-button>
 
     <MovieList />
 
-    <div v-if="showModal">
-      <AddMovie @close="closeModal" />
+    <div v-if="showMovieModal">
+      <AddMovie @close="closeMovieModal" />
+    </div>
+
+    <div v-if="showGenreModal">
+      <AddMovieGenre @close="closeGenreModal" />
+    </div>
+
+    <div v-if="showRoleModal">
+      <AssignRolesToMovie @close="closeRoleModal" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { ArrowLeft, Close, Plus } from '@element-plus/icons-vue';
+import { ArrowLeft } from '@element-plus/icons-vue';
 import MovieList from '@/components/MovieList.vue';
 import AddMovie from '@/components/AddMovie.vue';
+import { Icon } from '@iconify/vue';
+import AssignRolesToMovie from '@/components/AssignRolesToMovie.vue';
+import AddMovieGenre from '@/components/AddMovieGenre.vue';
 
-const showModal = ref(false);
+const showMovieModal = ref(false);
+const showRoleModal = ref(false);
+const showGenreModal = ref(false);
 
-const openModal = () => {
-  showModal.value = true;
+const openMovieModal = () => {
+  showMovieModal.value = true;
+};
+const closeMovieModal = () => {
+  showMovieModal.value = false;
+};
+const closeGenreModal = () => {
+  showGenreModal.value = false;
 };
 
-const closeModal = () => {
-  showModal.value = false;
+const openGenreModal = () => {
+  showGenreModal.value = true;
+};
+const openRoleModal = () => {
+  showRoleModal.value = true;
+};
+const closeRoleModal = () => {
+  showRoleModal.value = false;
 };
 </script>
 

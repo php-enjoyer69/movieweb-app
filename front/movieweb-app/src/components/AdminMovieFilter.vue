@@ -14,9 +14,9 @@
           </el-input>
         </div>
         <div class="filter-item">
-          <el-button type="primary" @click="clearFilters" class="clear-button">
+          <el-button type="success" @click="clearFilters" class="clear-button">
             Clear filters
-            <Icon icon="ic:round-clear" style="margin-left: 5px; font-size: large;" />
+            <Icon icon=codicon:clear-all style="margin-left: 5px; font-size: large; color: #9b4dca;" />
           </el-button>
         </div>
       </div>
@@ -26,7 +26,7 @@
       <el-collapse-item name="1" title="Advanced Search">
         <div class="advanced-search-section">
           <div class="filter-year-range">
-            <label class="filter-label">Year of production</label>
+            <label class="filter-label">Year of premiere</label>
             <div class="year-range-container">
               <div class="year-input-group">
                 <div class="year-label">From</div>
@@ -217,7 +217,7 @@ const activeNames = ref(['0']);
 }
 
 .clear-button {
-  max-width: 180px;
+  max-width: 160px;
   align-self: left;
   margin-top: 24px;
 }

@@ -8,19 +8,18 @@ import movieweb.movieweb.enums.SearchOperation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieSpecificationsBuilder
-{
+public class MovieSpecificationsBuilder {
+
   private List<SearchCriteria> params = new ArrayList<>();
 
-  public MovieSpecificationsBuilder with(String key, String operation, Object value, String prefix, String suffix)
-  {
+  public MovieSpecificationsBuilder with(String key, String operation, Object value, String prefix, String suffix) {
+
     SearchOperation op = SearchOperation.getSimpleOperation(operation.charAt(0));
 
     if (op == null)
       return this;
 
-    if (op == SearchOperation.EQUALITY)
-    {
+    if (op == SearchOperation.EQUALITY) {
       boolean startWithAsterisk = prefix.contains("*");
       boolean endWithAsterisk = suffix.contains("*");
 
@@ -32,19 +31,22 @@ public class MovieSpecificationsBuilder
         op = SearchOperation.STARTS_WITH;
     }
 
-    params.add(new SearchCriteria(key, op, value));
+    params.add(SearchCriteria.builder()
+            .key(key)
+            .operation(op)
+            .value(value)
+            .build());
+
     return this;
   }
 
-  public Specification<Movie> build()
-  {
+  public Specification<Movie> build() {
     if (params.isEmpty())
       return null;
 
-    Specification result = new MovieSpecification(params.get(0));
+    Specification<Movie> result = new MovieSpecification(params.get(0));
 
-    for (int i = 1; i < params.size(); i++)
-    {
+    for (int i = 1; i < params.size(); i++) {
       result = params.get(i).isOrPredicate()
               ? Specification.where(result).or(new MovieSpecification(params.get(i)))
               : Specification.where(result).and(new MovieSpecification(params.get(i)));
@@ -52,5 +54,4 @@ public class MovieSpecificationsBuilder
 
     return result;
   }
-
 }

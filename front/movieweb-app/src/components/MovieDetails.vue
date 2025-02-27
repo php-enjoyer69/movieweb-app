@@ -4,69 +4,184 @@
     <div class="movie-info">
       <h1>{{ movie.title }}</h1>
       <h3>{{ movie.year }}</h3>
-      <p>{{ movie.description }}</p>
-      <MovieGenreTags :genres="movie.genres" />
-      <p><strong>Director:</strong> {{ movie.director }}</p>
+      <el-collapse-transition>
+        <p v-if="showFullDescription && movie.description">{{ movie.description }}</p>
+        <p v-else>{{ truncatedDescription }}...</p>
+      </el-collapse-transition>
+
+      <el-link :underline="false" type="text" @click="toggleDescription">
+        {{ showFullDescription ? 'Show less' : 'Show more' }}
+        <el-icon>
+          <i :class="showFullDescription ? ArrowUp : ArrowDown"></i>
+        </el-icon>
+      </el-link>
+      <div class="movie-tags">
+        <MovieGenreTags :genres="movie.genres" />
+      </div>
+      <MovieCrew :movieId="movie.id" />
 
       <div class="movie-rating">
-        <p><strong>Average rating:</strong></p>
-        <el-rate v-model="averageRating" disabled show-score text-color="#ff9900" score-template="{value} points" />
+        <p style="margin: 0 0 -20px;"><strong>Average score</strong></p>
+        <h2 class="rating">
+          <Icon icon="mdi:star" style="color: #9b4dca;margin-bottom:-6px;font-size: xx-large;" />
+          {{ averageRating ? averageRating.toFixed(2) : 'N/A' }}
+          <span style="color: #888;margin:2px -3px; font-size: large;">/10</span>
+          <span class="rating-count">{{ movie.ratingCount }} reviews total</span>
+        </h2>
       </div>
 
-      <el-button type="primary" class="rate-movie-button" v-if="user" @click="openRateModal">
-  <Icon icon="mdi:star" class="star-icon" />
-  Rate this movie
-</el-button>
-      <el-button type="primary" class="rate-movie-button" v-if="user" @click="addToWatchlist">
-        <Icon icon="mdi:plus" class="plus-icon" />
-        Add to watchlist
-      </el-button>
 
-      <el-button type="primary" class="rate-movie-button" v-if="!user" @click="showLoginModal">
-        <Icon icon="mdi:star" class="star-icon" />
-        Rate this movie
-      </el-button>
-      <el-button type="primary" class="rate-movie-button" v-if="!user" @click="showLoginModal">
-        <Icon icon="mdi:plus" class="plus-icon" />
-        Add to watchlist
-      </el-button>
+      <MovieDetailsButtons :hasReviewed="hasReviewed" :toggleRatingForm="toggleRatingForm"
+        :toggleWatchlist="toggleWatchlist" :toggleFavorite="toggleFavorite" :showLoginModal="showLoginModal"
+        :isInWatchlist="isInWatchlist" :isFavorite="isFavorite" :showRatingForm="showRatingForm"
+        :toggleEditReviewForm="toggleEditReviewForm" :showEditReviewForm="showEditReviewForm" :deleteReview="deleteReview"/>
     </div>
   </div>
 
+  <transition name="slide-up" mode="out-in">
+    <ReviewMovieForm v-if="showRatingForm" :movieId="movie.id" />
+  </transition>
+
+  <transition name="slide-up" mode="out-in">
+    <EditReviewMovieForm v-if="showEditReviewForm && hasReviewed" :movieId="movie.id" :reviewId="userReview?.id"
+      :review="userReview" />
+  </transition>
+
+  <MovieActors :movieId="movie.id" />
   <MovieReviews :movieId="movie.id" />
-
-  <div v-if="loginModalVisible" class="modal-overlay" @click="closeModal">
-    <LoginModal :visible="loginModalVisible" @close="closeModal" />
-  </div>
-
-  <div v-if="rateModalVisible" class="modal-overlay" @click="closeModal">
-    <RateModal :visible="rateModalVisible" :movieId="movie.id" @close="closeModal" />
-  </div>
-
+  <LoginRequiredModal v-if="loginModalVisible" :visible="loginModalVisible" @close="closeModal" />
 </template>
 
 <script setup>
-import { defineProps, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import axios from 'axios';
+import { ref, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
-import MovieGenreTags from '@/components/MovieGenreTags.vue';
 import { useAuthStore } from '@/stores/auth.store';
 import { storeToRefs } from 'pinia';
-import LoginModal from './LoginModal.vue';
-import RateModal from './RateModal.vue';
-import MovieReviews from './MovieReviews.vue';
+import MovieGenreTags from '@/components/MovieGenreTags.vue';
+import MovieDetailsButtons from '@/components/MovieDetailsButtons.vue';
+import MovieReviews from '@/components/MovieReviews.vue';
+import LoginRequiredModal from '@/components/LoginRequiredModal.vue';
+import ReviewMovieForm from './ReviewMovieForm.vue';
+import EditReviewMovieForm from './EditReviewMovieForm.vue';
+import MovieActors from '@/components/MovieActors.vue';
+import MovieCrew from './MovieCrew.vue';
+import { ElMessage } from 'element-plus';
 
-const authStore = useAuthStore();
-const { user } = storeToRefs(authStore);
+const { user } = storeToRefs(useAuthStore());
+const props = defineProps({ movie: Object });
 
-const props = defineProps({
-  movie: Object,
-  user: Object,
+const showRatingForm = ref(false);
+const hasReviewed = ref(false);
+const loginModalVisible = ref(false);
+const showFullDescription = ref(false);
+const truncatedDescription = ref(props.movie.description?.slice(0, 200) || '');
+const isFavorite = ref(false);
+const isInWatchlist = ref(false);
+const averageRating = ref(props.movie.averageRating || 0);
+const showEditReviewForm = ref(false);
+const userReview = ref(null);
+
+onMounted(async () => {
+  if (!user.value) {
+    return;
+  }
+  try {
+    const [watchlistRes, favoriteRes, reviewRes] = await Promise.all([
+      axios.get(`/api/movie/watchlist/${user.value.id}/isInWatchlist/${props.movie.id}`),
+      axios.get(`/api/movie/favorites/${user.value.id}/isFavorite/${props.movie.id}`),
+      axios.get(`/api/movie/${props.movie.id}/review/${user.value.id}`)
+    ]);
+
+    isInWatchlist.value = watchlistRes.data;
+    isFavorite.value = favoriteRes.data;
+
+    if (reviewRes.data) {
+      hasReviewed.value = true;
+      userReview.value = reviewRes.data;
+    } else {
+      hasReviewed.value = false;
+      userReview.value = null;
+    }
+  } catch (error) {
+    console.error("Error fetching movie status", error);
+  }
 });
 
-const router = useRouter();
-const loginModalVisible = ref(false);
-const rateModalVisible = ref(false);
+const toggleWatchlist = async () => {
+  try {
+    const url = `/api/movie/watchlist/${props.movie.id}`;
+    const response = await axios({
+      method: isInWatchlist.value ? 'delete' : 'post',
+      url: url,
+      params: { userId: user.value.id },
+    });
+
+    isInWatchlist.value = !isInWatchlist.value;
+
+    ElMessage({
+      message: isInWatchlist.value ? 'Movie added to watchlist!' : 'Movie removed from watchlist.',
+      type: 'success',
+      duration: 3000,
+    });
+  } catch (error) {
+    console.error("Error toggling watchlist status", error);
+    ElMessage({
+      message: 'An error occurred while updating the watchlist. Please try again.',
+      type: 'error',
+      duration: 3000,
+    });
+  }
+};
+
+const toggleFavorite = async () => {
+  if (!user.value) return showLoginModal();
+  try {
+    const url = `/api/movie/favorites/${props.movie.id}`;
+    isFavorite.value
+      ? await axios.delete(url, { params: { userId: user.value.id } })
+      : await axios.post(url, null, { params: { userId: user.value.id } });
+
+    isFavorite.value = !isFavorite.value;
+
+    ElMessage({
+      message: isFavorite.value ? 'Movie added to favorites!' : 'Movie removed from favorites.',
+      type: 'success',
+      duration: 3000,
+    });
+
+  } catch (error) {
+    console.error("Error toggling favorite status", error);
+  }
+};
+
+const deleteReview = async () => {
+  if (!user.value || !userReview.value) return;
+
+  try {
+    await axios.delete(`/api/movie/${props.movie.id}/review/${userReview.value.id}`);
+
+    hasReviewed.value = false;
+    userReview.value = null;
+    showEditReviewForm.value = false;
+
+    ElMessage({
+      message: 'Review deleted successfully',
+      type: 'success',
+      duration: 3000,
+    });
+    setTimeout(() => {
+        window.location.reload();
+      }, 700);
+  } catch (error) {
+    console.error("Error deleting the review", error);
+    ElMessage({
+      message: 'An error occurred while deleting the review. Please try again',
+      type: 'error',
+      duration: 3000,
+    });
+  }
+};
 
 const showLoginModal = () => {
   loginModalVisible.value = true;
@@ -74,22 +189,25 @@ const showLoginModal = () => {
 
 const closeModal = () => {
   loginModalVisible.value = false;
-  rateModalVisible.value = false;
 };
 
-const openRateModal = () => {
-  console.log("Rate Modal Visible:", rateModalVisible.value);
-  rateModalVisible.value = true;
+const toggleDescription = () => {
+  showFullDescription.value = !showFullDescription.value;
 };
 
-const addToWatchlist = () => {
-  // Your code to add the movie to watchlist
+const toggleRatingForm = () => {
+  user.value ? showRatingForm.value = !showRatingForm.value : showLoginModal();
+};
+
+const toggleEditReviewForm = () => {
+  if (!user.value) {
+    showLoginModal();
+    return;
+  }
+  showEditReviewForm.value = !showEditReviewForm.value;
 };
 
 const getImageUrl = (imageName) => `/api/image/${imageName}`;
-
-const averageRating = ref(props.movie.averageRating || 0);
-
 </script>
 
 <style scoped>
@@ -100,7 +218,7 @@ const averageRating = ref(props.movie.averageRating || 0);
 
 .movie-img {
   width: 300px;
-  height: auto;
+  height: 450px;
   border-radius: 8px;
   object-fit: cover;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -108,53 +226,52 @@ const averageRating = ref(props.movie.averageRating || 0);
 
 .movie-info {
   flex: 1;
+  overflow: hidden;
 }
 
 h1 {
   font-size: 2em;
-  color: #333;
+  margin-top: -1px;
 }
 
 h3 {
-  margin-top: -10px;
-  margin-bottom: 40px;
   color: #6d6d6d;
+  margin-top: -15px;
 }
 
-p {
-  margin: 10px 0;
-  line-height: 1.6;
+.el-link {
+  margin-bottom: 25px;
 }
 
-.movie-rating {
-  margin: 10px 0;
+.movie-tags {
+  margin-bottom: -20px;
 }
 
-.rate-movie-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1em;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.movie-info p {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  margin-bottom: 20px;
 }
 
-.rate-movie-button .star-icon {
-  font-size: 1.2em;
-  margin-left: -4px;
-  margin-right: 5px;
-  color: gold;
+.el-collapse-transition {
+  transition: max-height 0.3s ease-out;
+  max-height: 400px;
 }
 
-.rate-movie-button .plus-icon {
-  font-size: 1.2em;
-  margin-left: -2px;
-  margin-right: 5px;
-  color: #d7b0ff;
+.movie-info p {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.rating {
+  font-size: xx-large;
+}
+
+.rating-count {
+  font-size: 0.4em;
+  color: #888;
+  font-weight: 400;
+  margin-left: 15px;
 }
 </style>

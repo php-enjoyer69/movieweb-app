@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 @Entity
-@Table(name = "reviews")
+@Table(name = "movie_reviews")
 public class Review {
 
     @Id
@@ -34,10 +34,19 @@ public class Review {
     @DecimalMax(value = "10.0", inclusive = true, message = "Rating must be at most 10.0")
     private Double rating;
 
-    @Column(nullable = false)
-    @Size(min = 2, max = 1000, message = "Review content must be between 2 and 1000 characters")
+    @Column(nullable = true)
+    @Size(min = 0, max = 5000, message = "Review content must be between 0 and 5000 characters")
     private String content;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = true)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "wants_to_watch_again", nullable = true)
+    private Boolean wantsToWatchAgain;
+
+    @Column(name = "like_count", nullable = false)
+    private int likeCount = 0;
+
+    @Column(name = "dislike_count", nullable = false)
+    private int dislikeCount = 0;
 }

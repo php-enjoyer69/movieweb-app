@@ -21,6 +21,8 @@ public class PopulateMovieDataLoader implements ApplicationRunner
   private final MovieMapper movieMapper;
   private final MovieGenreRepository movieGenreRepository;
 
+  private final Random rand = new Random();
+
   public void run(ApplicationArguments args)
   {
     populateMovieGenres();
@@ -29,32 +31,29 @@ public class PopulateMovieDataLoader implements ApplicationRunner
 
   private void populateMovies()
   {
-    MovieGenre action = movieGenreRepository.getByName("Action");
-    MovieGenre drama = movieGenreRepository.getByName("Drama");
-    MovieGenre horror = movieGenreRepository.getByName("Horror");
+    List<MovieGenre> allGenres = movieGenreRepository.findAll();
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 10; i++)
     {
+      int numberOfGenres = rand.nextInt(3) + 2;
       Set<MovieGenre> movieGenres = new HashSet<>();
 
-      if (i % 2 == 0) {
-        movieGenres.add(action);
-      }
-      else {
-        movieGenres.add(drama);
+      while (movieGenres.size() < numberOfGenres) {
+        movieGenres.add(getRandomMovieGenre(allGenres));
       }
 
-      if (i % 3 == 0) {
-        movieGenres.add(horror);
-      }
+      int randomYear = rand.nextInt(105) + 1920;
+
+      String imageName = "movie" + (rand.nextInt(21) + 1) + ".jpg";
 
       createMovie(NewMovieDto.builder()
                       .title("Movie " + (i + 1))
-                      .description("An interesting production")
+                      .description("Two men awaken to find themselves on the opposite sides of a dead body, each with specific instructions to kill the other or face consequences. These two are the latest victims of the Jigsaw Killer.")
                       .genres(movieGenres)
-                      .year(Integer.valueOf("2010"))
-                      .averageRating(Double.valueOf("0.0"))
-                      .img("movie1.jpg")
+                      .year(randomYear)
+                      .averageRating(0.0)
+                      .ratingCount(Integer.valueOf(0))
+                      .img(imageName)
                       .build(),
               movieGenres
       );
@@ -63,15 +62,13 @@ public class PopulateMovieDataLoader implements ApplicationRunner
 
   private void createMovie(NewMovieDto newMovieDto, Set<MovieGenre> movieGenres)
   {
-    Optional<Movie> existingMovie = movieRepository.findByTitle(newMovieDto.getTitle());
-
-    if (existingMovie.isEmpty())
-    {
-      Movie movie = movieMapper.newMovieDtoToMovie(newMovieDto);
-      movie.setGenres(movieGenres);
-
-      movieRepository.save(movie);
-    }
+    movieRepository.findByTitle(newMovieDto.getTitle())
+            .ifPresentOrElse(existingMovie -> {
+            }, () -> {
+              Movie movie = movieMapper.newMovieDtoToMovie(newMovieDto);
+              movie.setGenres(movieGenres);
+              movieRepository.save(movie);
+            });
   }
 
   private void populateMovieGenres()
@@ -84,15 +81,26 @@ public class PopulateMovieDataLoader implements ApplicationRunner
     createMovieGenre("Animation");
     createMovieGenre("Thriller");
     createMovieGenre("Fantasy");
+    createMovieGenre("Sci-Fi");
+    createMovieGenre("Adventure");
+    createMovieGenre("Crime");
+    createMovieGenre("Mystery");
+    createMovieGenre("Documentary");
+    createMovieGenre("Musical");
+    createMovieGenre("Family");
   }
 
   private void createMovieGenre(String name)
   {
-    Optional<MovieGenre> existingMovieGenre = movieGenreRepository.findByName(name);
+    movieGenreRepository.findByName(name)
+            .ifPresentOrElse(existingMovieGenre -> {
+            }, () -> {
+              movieGenreRepository.save(MovieGenre.builder().name(name).build());
+            });
+  }
 
-    if (existingMovieGenre.isEmpty())
-    {
-      movieGenreRepository.save(MovieGenre.builder().name(name).build());
-    }
+  private MovieGenre getRandomMovieGenre(List<MovieGenre> allGenres)
+  {
+    return allGenres.get(rand.nextInt(allGenres.size()));
   }
 }

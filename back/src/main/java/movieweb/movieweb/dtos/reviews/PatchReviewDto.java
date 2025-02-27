@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,6 +20,10 @@ public class PatchReviewDto {
     @DecimalMax(value = "10.0", inclusive = true, message = "Rating must be at most 10.0")
     private Double rating;
 
-    @Size(min = 2, max = 1000, message = "Review content must be between 2 and 1000 characters")
+    @Size(min = 0, max = 5000, message = "Review content must be between 0 and 5000 characters")
     private String content;
+
+    private LocalDateTime createdAt;
+
+    private Boolean wantsToWatchAgain;
 }

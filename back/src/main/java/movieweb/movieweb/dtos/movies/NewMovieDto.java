@@ -32,6 +32,8 @@ public class NewMovieDto
 
   private Double averageRating;
 
+  private Integer ratingCount;
+
   @NotNull(message = "At least one genre is required")
   private Set<MovieGenre> genres;
 

@@ -133,7 +133,7 @@ const submitMovie = async () => {
     });
 
     emit('close');
-    window.location.reload();
+
   } catch (err) {
     if (err.response && err.response.data && err.response.data.errors) {
       error.value = err.response.data.errors;
