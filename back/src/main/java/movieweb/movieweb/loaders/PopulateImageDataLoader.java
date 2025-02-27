@@ -19,30 +19,54 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PopulateImageDataLoader implements ApplicationRunner
 {
-  @Value("classpath:movie1.jpg")
-  private Resource resource;
+  @Value("classpath:movie*.jpg")
+  private Resource[] movieResources;
+
+  @Value("classpath:person*.jpg")
+  private Resource[] personResources;
+
+  @Value("classpath:avatar.jpg")
+  private Resource avatarResource;
 
   private final ImageRepository imageRepository;
   private final ImageService imageService;
 
+  @Override
   public void run(ApplicationArguments args)
   {
-    Optional<Image> optionalImage = imageRepository.findByName(resource.getFilename());
+    loadImages(movieResources);
+    loadImages(personResources);
+    loadAvatarImage();
+  }
 
-    if (optionalImage.isPresent())
-      return;
+  private void loadImages(Resource[] resources) {
+    for (Resource resource : resources) {
+      saveImageIfNotExists(resource);
+    }
+  }
 
-    try (InputStream inputStream = resource.getInputStream()) {
-      byte[] imageBytes = inputStream.readAllBytes();
+  private void loadAvatarImage() {
+    if (avatarResource.exists()) {
+      saveImageIfNotExists(avatarResource);
+    }
+  }
 
-      imageRepository.save(
-          Image.builder()
-              .name(resource.getFilename())
-              .type(MediaType.IMAGE_JPEG_VALUE)
-              .imageBlob(imageService.compress(imageBytes))
-              .build()
-      );
+  private void saveImageIfNotExists(Resource resource) {
+    try {
+      Optional<Image> optionalImage = imageRepository.findByName(resource.getFilename());
+      if (optionalImage.isPresent()) return;
 
+      try (InputStream inputStream = resource.getInputStream()) {
+        byte[] imageBytes = inputStream.readAllBytes();
+
+        imageRepository.save(
+                Image.builder()
+                        .name(resource.getFilename())
+                        .type(MediaType.IMAGE_JPEG_VALUE)
+                        .imageBlob(imageService.compress(imageBytes))
+                        .build()
+        );
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
